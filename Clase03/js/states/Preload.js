@@ -3,6 +3,10 @@ Preload = function(game){}
 
 Preload.prototype = {
 	preload:function(){
+		this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+		this.game.scale.pageAlignHorizontally = true;
+		this.game.scale.pageAlignVertically = true;
+
 		this.game.load.image("barrel","assets/images/barrel.png");
 		this.game.load.image("actionButton","assets/images/actionButton.png");
 		this.game.load.image("arrowButton","assets/images/arrowButton.png");

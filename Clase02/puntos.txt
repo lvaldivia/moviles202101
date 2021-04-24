@@ -11,5 +11,11 @@ Mecánica 2
 1. Andrés => 2
 2. Daniel => 4
 3. Geral => 2
-4.
+
+
+
+Mecanica 3
+1. Geral =>2
+2. Mariano =>2
+3. Daniel => 2
 
