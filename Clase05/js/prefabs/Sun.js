@@ -26,7 +26,7 @@ Sun.prototype.update= function(){
 	}
 }
 
-Sun.prototype.killSum = function(){
+Sun.prototype.killSun = function(){
 	this.increaseSun.dispatch(this.points);
 	this.kill();
 }

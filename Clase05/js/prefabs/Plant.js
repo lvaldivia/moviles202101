@@ -44,7 +44,7 @@ Plant.prototype.shoot = function(){
 	if(this.animations.getAnimation(this.animationName)){
 		this.animations.play(this.animationName);
 	}
-	this.createBullet.dispatch(this.x,this.y);
+	this.createBullet.dispatch(this.x,this.y - (this.height/2.6));
 }
 
 Plant.prototype.update = function(){

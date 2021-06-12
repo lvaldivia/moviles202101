@@ -22,23 +22,72 @@ Game.prototype = {
 		this.loadLevel();
 	},
 	loadLevel:function(){
+		this.startGameElapsed = 0;
 		this.levelName = "level"+this.currentLevel;
 		this.levelData = JSON.parse(this.game.cache.getText(this.levelName));
 		this.zombieElapsed = 0;
 		this.currentZombie = 0;
+		this.zombies = this.game.add.group();
 		this.zombieData = this.levelData.zombies;
 		this.totalZombies = this.zombieData.length - 1;
 		this.zombieTotalTime = this.zombieData[this.currentZombie].time * 1000;
 	},
 	update:function(){
+		this.startGameElapsed+=this.game.time.elapsed;
 		this.sunElapsed += this.game.time.elapsed;
 		if(this.sunElapsed >= this.totalSunElapsed){
 			this.sunElapsed = 0;
 			this.generateSun();
 		}
-	},
-	generateSun:function(){
+		if(this.startGameElapsed>=20000){
+			this.zombieElapsed+=this.game.time.elapsed;
+			if(this.zombieElapsed>=this.zombieTotalTime){
+				this.zombieElapsed = 0;
+				this.generateZombie(this.zombieData[this.currentZombie]);
+				this.currentZombie++;
+				if(this.totalZombies<=this.currentZombie){
+					this.currentZombie = 0;
+				}
+				this.zombieTotalTime = this.zombieData[this.currentZombie].time * 1000;
+			}
+			this.zombies.forEachAlive(function(zombie){
+				if(zombie.x < 50){
+					zombie.kill();
+				}
+			},this);
 
+			this.game.physics.arcade.overlap(this.zombies,this.bullets,null,this.damageZombie,this);	
+		}
+		
+	},
+	damageZombie:function(zombie,bullet){
+		bullet.kill();
+		zombie.damage(2);
+	},
+	generateZombie:function(zombieData){
+		let posY = this.game.rnd.integerInRange(0,this.zombieYPosition.length-1);
+		let zombie = this.zombies.getFirstDead();
+		if(zombie){
+			zombie.reset(this.game.width - 50,this.zombieYPosition[posY],zombieData);
+		}else{
+			zombie = new Zombie(this.game,this.game.width - 50,this.zombieYPosition[posY],zombieData);
+		}
+		this.zombies.add(zombie);
+	},
+	generateSun:function(posX,posY){
+		let newSun = this.suns.getFirstDead();
+		let x =  posX ? posX : this.game.rnd.integerInRange(40,420);
+		let y = posY ? posY : -20;
+		let velocity = posX ? -this.sunVelocity : this.sunVelocity;
+		//if(!newSun){
+			newSun = new Sun(this.game,x,y,velocity);
+			this.suns.add(newSun);
+			newSun.increaseSun.add(this.updatePoints,this);
+		//}
+	},
+	updatePoints:function(points){
+		this.numSums+=points;
+		this.updateStats();
 	},
 	createGui:function(){
 		let sun = this.game.add.sprite(10,this.game.height - 20 ,'sun');
@@ -61,7 +110,7 @@ Game.prototype = {
 		this.updateStats();
 	},
 	clickedButton:function(element){
-		console.log(element);
+		//console.log(element);
 		this.currentSelection = element;
 		//this.buttons.callAll("unselected");
 	},
@@ -93,10 +142,17 @@ Game.prototype = {
 		if(this.currentSelection && this.currentSelection.cost <= this.numSums){
 			let plant = new Plant(this.game,sprite.x + (sprite.width/2),sprite.y+(sprite.height/2),this.currentSelection);
 			this.plants.add(plant);
+			plant.createSun.add(this.generateSun,this);
+			plant.createBullet.add(this.createBullet,this);
 			this.numSums-= this.currentSelection.cost;
 			this.updateStats();
 			this.clearSelection();
 		}
+	},
+	createBullet:function(posX,posY){
+		let bullet = new Bullet(this.game,posX,posY);
+		this.bullets.add(bullet);
+		this.hitSound.play();
 	},
 	clearSelection:function(){
 		this.currentSelection = null;

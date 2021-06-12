@@ -12,6 +12,7 @@ Preload.prototype = {
 		this.game.load.image("plantButton","assets/images/button_plant.png");
 		this.game.load.image("sunflowerButton","assets/images/button_sunflower.png");
 		this.game.load.image("blood","assets/images/blood.png");
+		this.game.load.image("bullet","assets/images/bullet.png");
 		this.game.load.image("chilli","assets/images/chilli.png");
 		this.game.load.image("sunflower","assets/images/sunflower.png");
 		this.game.load.image("dead_zombie","assets/images/dead_zombie.png");

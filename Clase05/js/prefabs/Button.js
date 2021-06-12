@@ -17,7 +17,7 @@ Button.prototype.clickButton = function(){
 }
 
 Button.prototype.unselected  = function(){
-	console.log("unselected");
+	//console.log("unselected");
 	this.selected = false;
 	this.alpha = 1;
 }

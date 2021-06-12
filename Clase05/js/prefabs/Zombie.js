@@ -26,5 +26,18 @@ Zombie.prototype.reset = function(x,y,data){
 
 Zombie.prototype.damage = function(amount){
 	Phaser.Sprite.prototype.damage.call(this,amount);
-	//TODO implementar particula de sangre
+	console.log(this.health);
+	let emitter = this.game.add.emitter(this.x,this.y,50);
+	emitter.makeParticles('blood');
+	emitter.minParticleSpeed.setTo(-100,-100);
+	emitter.maxParticleSpeed.setTo(100,100);
+	emitter.gravity = 300;
+	emitter.start(true,200,null,100);
+	if(this.health<=0){
+		this.kill();
+		let body = this.game.add.sprite(this.x,this.bottom,'dead_zombie');	
+		body.anchor.setTo(0.5);
+
+	}
+	
 }
