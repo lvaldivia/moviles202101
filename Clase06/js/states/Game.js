@@ -20,6 +20,7 @@ Game.prototype = {
 		this.player.anchor.setTo(0.5);
 		this.player.animations.add('running',[0,1,2,3,2,1],15,true);
 		this.player.animations.play("running");
+		this.game.physics.arcade.enable(this.player);
 		this.water = this.game.add.tileSprite(0,this.game.height - 30,this.game.width,30,'water');
 		this.water.autoScroll(-this.levelSpeed/2,0);
 
@@ -60,13 +61,11 @@ Game.prototype = {
 	},
 	generateRandomPlatform:function(){
 		let data = {};
-
 		let minSeparation = 60;
 		let maxSeparation = 200;
 		data.separation = minSeparation + Math.random() *(maxSeparation - minSeparation);
 		let minDifY = -120;
 		let maxDifY = 120;
-
 		data.y = this.currentPlatform.children[0].y + minDifY + Math.random() * (maxDifY - minDifY);
 		data.y = Math.max(150,data.y);
 		data.y = Math.min(this.game.height - 50,data.y);
@@ -78,6 +77,12 @@ Game.prototype = {
 		return data;
 	},
 	update:function(){
+		if(!this.player.alive){
+			return;
+		}
+		this.platformPool.forEachAlive(function(platform){
+			this.game.physics.arcade.collide(this.player,platform);
+		},this);
 		if(this.currentPlatform.length && this.currentPlatform.children[this.currentPlatform.length -1].right < this.game.width){
 			this.createPlatform();
 		}
