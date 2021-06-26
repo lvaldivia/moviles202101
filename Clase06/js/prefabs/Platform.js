@@ -46,6 +46,21 @@ Platform.prototype.kill = function(){
 }
 
 Platform.prototype.addCoins = function(speed){
-
+	let coinsY = 90 + Math.random() * 110;
+	let hasCoin = false;
+	this.forEach(function(tile){
+		hasCoin = Math.random() <= 0.4;
+		if(hasCoin){
+			let coin = this.coinsPool.getFirstDead();
+			if(coin){
+				coin.reset(tile.x,tile.y - coinsY);
+			}else{
+				coin = new Phaser.Sprite(this.game,tile.x,tile.y - coinsY,'coin');
+				this.coinsPool.add(coin);
+			}
+			coin.body.velocity.x = speed;
+			coin.body.allowGravity = false;
+		}
+	},this);
 }
 
