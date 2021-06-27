@@ -27,8 +27,21 @@ Game.prototype = {
 
 		let playerArr = this.findObjectsByType("player",this.map,'objectsLayer');
 		this.player = this.game.add.sprite(playerArr[0].x,playerArr[0].y,'player');
+		this.game.physics.arcade.enable(this.player);
+		this.player.animations.add('walking',[0,1,2,1],6,true);
+		this.player.body.collideWorldBounds = true;
 		this.player.anchor.setTo(0.5);
+		this.enemies = this.game.add.group();
+		this.createEnemies();
 
+	},
+	createEnemies:function(){
+		let enemyArr = this.findObjectsByType("enemy",this.map,'objectsLayer');
+		let enemy = {};
+		enemyArr.forEach(function(element){
+			enemy = new Enemy(this.game,element.x,element.y,'slime',element.properties.velocity,this.map);
+			this.enemies.add(enemy);
+		},this)
 	},
 	findObjectsByType: function(targetType, tilemap, layer){
 	    var result = [];
@@ -41,4 +54,38 @@ Game.prototype = {
 	    
 	    return result;
   },
+
+ 	update:function(){
+ 		this.game.physics.arcade.collide(this.player,this.collisionLayer);
+ 		this.game.physics.arcade.collide(this.enemies,this.collisionLayer);
+ 		this.game.physics.arcade.collide(this.player,this.enemies,this.hitEnemy,null,this);
+
+ 		this.player.body.velocity.x = 0;
+ 		if(this.cursors.left.isDown){
+ 			this.player.body.velocity.x = -this.RUNNING_SPEED;
+ 			this.player.scale.setTo(1,1);
+ 			this.player.play("walking");
+ 		}else if(this.cursors.right.isDown){
+ 			this.player.body.velocity.x = this.RUNNING_SPEED;
+ 			this.player.scale.setTo(-1,1);
+ 			this.player.play("walking");
+ 		}else{
+ 			this.player.animations.stop();
+ 			this.player.frame = 3;
+ 		}
+ 		if(this.cursors.up.isDown && (this.player.body.touching.down || this.player.body.blocked.down)){
+ 			this.player.body.velocity.y = -this.JUMPING_SPEED;
+ 		}
+ 	},
+ 	hitEnemy:function(player,enemy){
+ 		if(enemy.body.touching.up){
+ 			enemy.kill();
+ 			player.body.velocity.y = -this.BOUNCING_SPEED;
+ 		}else{
+ 			this.gameOver();
+ 		}
+ 	},
+ 	gameOver:function(){
+ 		this.game.state.start("Game",true,false,this.currentLevel);
+ 	}
 }
